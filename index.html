@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Energy Tracker - Appliance Comparison</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -53,57 +55,68 @@
     </div>
 
     <script>
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+          apiKey: "AIzaSyBhZmLP6iim7woNW8ofjNu2d9OQtogACbU",
+          authDomain: "appliance-tracker-ac31a.firebaseapp.com",
+          projectId: "appliance-tracker-ac31a",
+          storageBucket: "appliance-tracker-ac31a.firebasestorage.app",
+          messagingSenderId: "94689910263",
+          appId: "1:94689910263:web:272206295a7c774d1462f2",
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
         let appliances = [];
 
-        // Load data
+        // Load data from Firebase
         async function loadData() {
             try {
-                const response = await fetch('data.json');
-                appliances = await response.json();
+                const snapshot = await db.collection('appliances').orderBy('date', 'desc').get();
+                appliances = [];
+                snapshot.forEach(doc => {
+                    appliances.push({ id: doc.id, ...doc.data() });
+                });
                 updateDashboard();
             } catch (error) {
-                console.log('Starting with empty database');
-                appliances = [];
-                updateDashboard();
+                console.error('Error loading data:', error);
+                document.getElementById('totalSubmissions').textContent = 'Error loading';
             }
         }
 
         function updateDashboard() {
-            // Update stats
             document.getElementById('totalSubmissions').textContent = appliances.length;
             
             if (appliances.length > 0) {
-                const totalUsage = appliances.reduce((sum, a) => sum + a.usage, 0);
+                const totalUsage = appliances.reduce((sum, a) => sum + (a.usage || 0), 0);
                 const avg = (totalUsage / appliances.length).toFixed(1);
                 document.getElementById('avgUsage').textContent = `${avg} kWh`;
             }
 
-            // Update table
             const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = appliances.slice(-10).reverse().map(app => `
+            tbody.innerHTML = appliances.slice(0, 20).map(app => `
                 <tr>
-                    <td>${app.type}</td>
-                    <td>${app.model}</td>
-                    <td>${app.usage} kWh</td>
+                    <td>${app.type || 'Unknown'}</td>
+                    <td>${app.model || 'Not specified'}</td>
+                    <td>${app.usage || 0} kWh</td>
                     <td>${app.age || 'N/A'}</td>
-                    <td>${new Date(app.date).toLocaleDateString()}</td>
+                    <td>${app.date ? new Date(app.date).toLocaleDateString() : 'N/A'}</td>
                 </tr>
             `).join('');
 
-            // Update chart
             updateChart();
         }
 
         function updateChart() {
             const ctx = document.getElementById('usageChart').getContext('2d');
             
-            // Group by type
             const byType = {};
             appliances.forEach(app => {
                 if (!byType[app.type]) {
                     byType[app.type] = { total: 0, count: 0 };
                 }
-                byType[app.type].total += app.usage;
+                byType[app.type].total += (app.usage || 0);
                 byType[app.type].count++;
             });
 
@@ -119,10 +132,7 @@
                     datasets: [{
                         label: 'Average Monthly Usage (kWh)',
                         data: averages,
-                        backgroundColor: [
-                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', 
-                            '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF'
-                        ]
+                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40']
                     }]
                 },
                 options: {
@@ -130,10 +140,7 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'kWh per month'
-                            }
+                            title: { display: true, text: 'kWh per month' }
                         }
                     }
                 }
