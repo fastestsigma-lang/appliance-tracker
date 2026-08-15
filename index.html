@@ -55,7 +55,6 @@
     </div>
 
     <script>
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
         const firebaseConfig = {
           apiKey: "AIzaSyBhZmLP6iim7woNW8ofjNu2d9OQtogACbU",
           authDomain: "appliance-tracker-ac31a.firebaseapp.com",
@@ -70,18 +69,30 @@
 
         let appliances = [];
 
-        // Load data from Firebase
         async function loadData() {
             try {
-                const snapshot = await db.collection('appliances').orderBy('date', 'desc').get();
+                console.log("Fetching data from Firebase...");
+                // Removed orderBy to prevent index errors, we will sort in JS instead
+                const snapshot = await db.collection('appliances').get();
+                
                 appliances = [];
                 snapshot.forEach(doc => {
                     appliances.push({ id: doc.id, ...doc.data() });
                 });
+                
+                console.log("Found " + appliances.length + " appliances:", appliances);
+
+                // Sort by date in JavaScript (newest first)
+                appliances.sort((a, b) => {
+                    const dateA = new Date(a.date || 0);
+                    const dateB = new Date(b.date || 0);
+                    return dateB - dateA;
+                });
+                
                 updateDashboard();
             } catch (error) {
                 console.error('Error loading data:', error);
-                document.getElementById('totalSubmissions').textContent = 'Error loading';
+                document.getElementById('totalSubmissions').textContent = 'Error: ' + error.message;
             }
         }
 
@@ -89,21 +100,27 @@
             document.getElementById('totalSubmissions').textContent = appliances.length;
             
             if (appliances.length > 0) {
-                const totalUsage = appliances.reduce((sum, a) => sum + (a.usage || 0), 0);
+                const totalUsage = appliances.reduce((sum, a) => sum + (parseFloat(a.usage) || 0), 0);
                 const avg = (totalUsage / appliances.length).toFixed(1);
                 document.getElementById('avgUsage').textContent = `${avg} kWh`;
+            } else {
+                document.getElementById('avgUsage').textContent = `0 kWh`;
             }
 
             const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = appliances.slice(0, 20).map(app => `
-                <tr>
-                    <td>${app.type || 'Unknown'}</td>
-                    <td>${app.model || 'Not specified'}</td>
-                    <td>${app.usage || 0} kWh</td>
-                    <td>${app.age || 'N/A'}</td>
-                    <td>${app.date ? new Date(app.date).toLocaleDateString() : 'N/A'}</td>
-                </tr>
-            `).join('');
+            if (appliances.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No submissions yet. Be the first!</td></tr>';
+            } else {
+                tbody.innerHTML = appliances.slice(0, 20).map(app => `
+                    <tr>
+                        <td>${app.type || 'Unknown'}</td>
+                        <td>${app.model || 'Not specified'}</td>
+                        <td>${app.usage || 0} kWh</td>
+                        <td>${app.age || 'N/A'}</td>
+                        <td>${app.date ? new Date(app.date).toLocaleDateString() : 'N/A'}</td>
+                    </tr>
+                `).join('');
+            }
 
             updateChart();
         }
@@ -116,7 +133,7 @@
                 if (!byType[app.type]) {
                     byType[app.type] = { total: 0, count: 0 };
                 }
-                byType[app.type].total += (app.usage || 0);
+                byType[app.type].total += (parseFloat(app.usage) || 0);
                 byType[app.type].count++;
             });
 
@@ -125,7 +142,12 @@
                 (byType[type].total / byType[type].count).toFixed(1)
             );
 
-            new Chart(ctx, {
+            // Destroy old chart if it exists to prevent overlapping
+            if (window.myChart) {
+                window.myChart.destroy();
+            }
+
+            window.myChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
