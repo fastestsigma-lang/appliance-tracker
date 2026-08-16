@@ -13,7 +13,11 @@
 
         <header class="instrument-rail">
             <div class="rail-mark">
-                <div class="rail-mark-glyph"></div>
+                <div class="rail-mark-glyph">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                    </svg>
+                </div>
                 <div>
                     <div class="rail-name">ENERGY&nbsp;TRACKER</div>
                     <div class="rail-sub">Domestic Load Registry</div>
@@ -28,25 +32,44 @@
         <section class="page-head">
             <div class="page-eyebrow">New Entry · Registry Submission</div>
             <h1 class="page-title">Add Appliance</h1>
-            <p class="page-desc">Log an appliance's energy draw to calibrate the community registry.</p>
+            <p class="page-desc">Log an appliance's energy draw to help calibrate the community registry.</p>
         </section>
 
         <form id="applianceForm" class="form-panel">
             <div class="form-field">
                 <label class="form-label">Appliance Type *</label>
-                <select id="type" class="form-select" required>
-                    <option value="">Select an appliance…</option>
-                    <option value="Oven">Oven</option>
-                    <option value="Dishwasher">Dishwasher</option>
-                    <option value="Washing Machine">Washing Machine</option>
-                    <option value="Fridge">Fridge</option>
-                    <option value="Freezer">Freezer</option>
-                    <option value="Tumble Dryer">Tumble Dryer</option>
-                    <option value="TV">TV</option>
-                    <option value="Computer">Computer</option>
-                    <option value="Microwave">Microwave</option>
-                    <option value="Other">Other</option>
-                </select>
+                <div class="custom-dropdown" data-target="type">
+                    <div class="dropdown-trigger">
+                        <span class="dropdown-value placeholder">Select an appliance…</span>
+                        <div class="dropdown-arrow"></div>
+                    </div>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-option is-selected" data-value="">Select an appliance…</div>
+                        <div class="dropdown-option" data-value="Oven">Oven</div>
+                        <div class="dropdown-option" data-value="Dishwasher">Dishwasher</div>
+                        <div class="dropdown-option" data-value="Washing Machine">Washing Machine</div>
+                        <div class="dropdown-option" data-value="Fridge">Fridge</div>
+                        <div class="dropdown-option" data-value="Freezer">Freezer</div>
+                        <div class="dropdown-option" data-value="Tumble Dryer">Tumble Dryer</div>
+                        <div class="dropdown-option" data-value="TV">TV</div>
+                        <div class="dropdown-option" data-value="Computer">Computer</div>
+                        <div class="dropdown-option" data-value="Microwave">Microwave</div>
+                        <div class="dropdown-option" data-value="Other">Other</div>
+                    </div>
+                    <select id="type" class="form-select" style="display:none;" required>
+                        <option value="">Select an appliance…</option>
+                        <option value="Oven">Oven</option>
+                        <option value="Dishwasher">Dishwasher</option>
+                        <option value="Washing Machine">Washing Machine</option>
+                        <option value="Fridge">Fridge</option>
+                        <option value="Freezer">Freezer</option>
+                        <option value="Tumble Dryer">Tumble Dryer</option>
+                        <option value="TV">TV</option>
+                        <option value="Computer">Computer</option>
+                        <option value="Microwave">Microwave</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
             </div>
 
             <div class="form-field">
@@ -62,13 +85,26 @@
 
             <div class="form-field">
                 <label class="form-label">Age of Appliance</label>
-                <select id="age" class="form-select">
-                    <option value="">Select age range…</option>
-                    <option value="0-2 years">0-2 years</option>
-                    <option value="3-5 years">3-5 years</option>
-                    <option value="6-10 years">6-10 years</option>
-                    <option value="10+ years">10+ years</option>
-                </select>
+                <div class="custom-dropdown" data-target="age">
+                    <div class="dropdown-trigger">
+                        <span class="dropdown-value placeholder">Select age range…</span>
+                        <div class="dropdown-arrow"></div>
+                    </div>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-option is-selected" data-value="">Select age range…</div>
+                        <div class="dropdown-option" data-value="0-2 years">0-2 years</div>
+                        <div class="dropdown-option" data-value="3-5 years">3-5 years</div>
+                        <div class="dropdown-option" data-value="6-10 years">6-10 years</div>
+                        <div class="dropdown-option" data-value="10+ years">10+ years</div>
+                    </div>
+                    <select id="age" class="form-select" style="display:none;">
+                        <option value="">Select age range…</option>
+                        <option value="0-2 years">0-2 years</option>
+                        <option value="3-5 years">3-5 years</option>
+                        <option value="6-10 years">6-10 years</option>
+                        <option value="10+ years">10+ years</option>
+                    </select>
+                </div>
             </div>
 
             <div class="form-field">
@@ -124,6 +160,59 @@
                 alert('Error saving data: ' + error.message);
                 console.error(error);
             }
+        });
+
+        // Custom dropdown logic
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
+                const trigger = dropdown.querySelector('.dropdown-trigger');
+                const menu = dropdown.querySelector('.dropdown-menu');
+                const hiddenSelect = dropdown.querySelector('select');
+                const options = dropdown.querySelectorAll('.dropdown-option');
+
+                trigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isOpen = trigger.classList.contains('is-open');
+                    
+                    document.querySelectorAll('.custom-dropdown').forEach(d => {
+                        d.querySelector('.dropdown-trigger').classList.remove('is-open');
+                        d.querySelector('.dropdown-menu').classList.remove('is-visible');
+                    });
+
+                    if (!isOpen) {
+                        trigger.classList.add('is-open');
+                        menu.classList.add('is-visible');
+                    }
+                });
+
+                options.forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const val = option.getAttribute('data-value');
+                        const valueSpan = trigger.querySelector('.dropdown-value');
+                        
+                        valueSpan.textContent = option.textContent;
+                        if (val === '') valueSpan.classList.add('placeholder');
+                        else valueSpan.classList.remove('placeholder');
+
+                        options.forEach(o => o.classList.remove('is-selected'));
+                        option.classList.add('is-selected');
+
+                        hiddenSelect.value = val;
+                        hiddenSelect.dispatchEvent(new Event('change'));
+
+                        trigger.classList.remove('is-open');
+                        menu.classList.remove('is-visible');
+                    });
+                });
+            });
+
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.custom-dropdown').forEach(d => {
+                    d.querySelector('.dropdown-trigger').classList.remove('is-open');
+                    d.querySelector('.dropdown-menu').classList.remove('is-visible');
+                });
+            });
         });
     </script>
 </body>
