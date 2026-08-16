@@ -149,6 +149,7 @@
                                 <th>Monthly Usage</th>
                                 <th>Age</th>
                                 <th>Submitted</th>
+                                <th class="th-remove">Remove</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody"></tbody>
@@ -228,7 +229,7 @@
             if (filteredAppliances.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="5">
+                        <td colspan="6">
                             <div class="empty-state">
                                 <div class="empty-state-mark">//</div>
                                 <div>No submissions match this filter</div>
@@ -244,6 +245,11 @@
                         <td><span class="num">${app.usage || 0}</span> kWh</td>
                         <td>${app.age || 'N/A'}</td>
                         <td>${app.date ? new Date(app.date).toLocaleDateString() : 'N/A'}</td>
+                        <td class="td-remove">
+                            <button class="row-remove" data-id="${app.id}" aria-label="Remove entry" title="Remove entry">
+                                <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.5 2.5L9.5 9.5M9.5 2.5L2.5 9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                            </button>
+                        </td>
                     </tr>
                 `).join('');
             }
@@ -455,6 +461,33 @@
             a.click();
             window.URL.revokeObjectURL(url);
         }
+
+        async function removeAppliance(id) {
+            const appliance = appliances.find(a => a.id === id);
+            const label = appliance
+                ? `${appliance.type || 'this appliance'}${appliance.model && appliance.model !== 'Not specified' ? ' — ' + appliance.model : ''}`
+                : 'this entry';
+
+            const confirmed = window.confirm(`Remove ${label} from the registry? This cannot be undone.`);
+            if (!confirmed) return;
+
+            try {
+                await db.collection('appliances').doc(id).delete();
+                appliances = appliances.filter(a => a.id !== id);
+                filteredAppliances = filteredAppliances.filter(a => a.id !== id);
+                updateDashboard();
+                populateFilters();
+            } catch (error) {
+                alert('Error removing entry: ' + error.message);
+                console.error(error);
+            }
+        }
+
+        document.getElementById('tableBody').addEventListener('click', (e) => {
+            const btn = e.target.closest('.row-remove');
+            if (!btn) return;
+            removeAppliance(btn.dataset.id);
+        });
 
         document.getElementById('searchInput').addEventListener('input', applyFilters);
         document.getElementById('typeFilter').addEventListener('change', applyFilters);
