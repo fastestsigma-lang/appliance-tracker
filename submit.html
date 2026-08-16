@@ -9,68 +9,90 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>ADD YOUR APPLIANCE</h1>
-            <p>Share your appliance's energy usage with the community</p>
-        </header>
-
-        <nav>
-            <a href="index.html">Dashboard</a>
-            <a href="submit.html" class="active">Add Appliance</a>
-        </nav>
-
-        <form id="applianceForm" class="form-container">
-            <div class="form-group">
-                <label for="type">Appliance Type *</label>
-                <select id="type" required>
-                    <option value="">Select...</option>
-                    <option value="Oven">Oven</option>
-                    <option value="Dishwasher">Dishwasher</option>
-                    <option value="Washing Machine">Washing Machine</option>
-                    <option value="Fridge">Fridge</option>
-                    <option value="Freezer">Freezer</option>
-                    <option value="Tumble Dryer">Tumble Dryer</option>
-                    <option value="TV">TV</option>
-                    <option value="Computer">Computer</option>
-                    <option value="Microwave">Microwave</option>
-                    <option value="Other">Other</option>
-                </select>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">Energy Tracker</div>
+                <div class="sidebar-tagline">Community-powered insights</div>
             </div>
-
-            <div class="form-group">
-                <label for="model">Brand/Model</label>
-                <input type="text" id="model" placeholder="e.g., Samsung WW9000">
+            
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="submit.html" class="nav-item active">
+                    <span class="nav-icon"></span>
+                    <span>Add Appliance</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div>Built with care</div>
+                <div style="margin-top: 4px;">© 2026</div>
             </div>
+        </aside>
 
-            <div class="form-group">
-                <label for="usage">Monthly Energy Usage (kWh) *</label>
-                <input type="number" id="usage" step="0.1" required placeholder="e.g., 45.5">
-                <small>Check your bill or appliance label</small>
+        <main class="main-content">
+            <header class="page-header">
+                <h1 class="page-title">Add Appliance</h1>
+                <p class="page-subtitle">Share your appliance's energy usage to help the community</p>
+            </header>
+
+            <form id="applianceForm" class="form-container">
+                <div class="form-group">
+                    <label class="form-label">Appliance Type *</label>
+                    <select id="type" class="form-select" required>
+                        <option value="">Select an appliance...</option>
+                        <option value="Oven">Oven</option>
+                        <option value="Dishwasher">Dishwasher</option>
+                        <option value="Washing Machine">Washing Machine</option>
+                        <option value="Fridge">Fridge</option>
+                        <option value="Freezer">Freezer</option>
+                        <option value="Tumble Dryer">Tumble Dryer</option>
+                        <option value="TV">TV</option>
+                        <option value="Computer">Computer</option>
+                        <option value="Microwave">Microwave</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Brand / Model</label>
+                    <input type="text" id="model" class="form-input" placeholder="e.g., Samsung WW9000">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Monthly Energy Usage (kWh) *</label>
+                    <input type="number" id="usage" class="form-input" step="0.1" required placeholder="e.g., 45.5">
+                    <small class="form-hint">Check your electricity bill or appliance label</small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Age of Appliance</label>
+                    <select id="age" class="form-select">
+                        <option value="">Select age range...</option>
+                        <option value="0-2 years">0-2 years</option>
+                        <option value="3-5 years">3-5 years</option>
+                        <option value="6-10 years">6-10 years</option>
+                        <option value="10+ years">10+ years</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Additional Notes</label>
+                    <textarea id="notes" class="form-textarea" placeholder="Any details about usage patterns, frequency, etc..."></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">Submit Data →</button>
+            </form>
+
+            <div id="successMessage" class="success-message" style="display: none;">
+                <div class="success-icon">✓</div>
+                <div class="success-title">Data submitted successfully</div>
+                <div class="success-text">Your contribution helps the community understand energy usage better.</div>
             </div>
-
-            <div class="form-group">
-                <label for="age">Age of Appliance</label>
-                <select id="age">
-                    <option value="">Select...</option>
-                    <option value="0-2 years">0-2 years</option>
-                    <option value="3-5 years">3-5 years</option>
-                    <option value="6-10 years">6-10 years</option>
-                    <option value="10+ years">10+ years</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="notes">Additional Notes</label>
-                <textarea id="notes" rows="3" placeholder="Any details about usage patterns..."></textarea>
-            </div>
-
-            <button type="submit" class="submit-btn">Submit Data</button>
-        </form>
-
-        <div id="successMessage" class="success-message" style="display: none;">
-            ✓ Data submitted successfully
-        </div>
+        </main>
     </div>
 
     <script>
@@ -105,7 +127,7 @@
 
                 setTimeout(() => {
                     window.location.href = 'index.html';
-                }, 2000);
+                }, 2500);
             } catch (error) {
                 alert('Error saving data: ' + error.message);
                 console.error(error);
