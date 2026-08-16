@@ -647,6 +647,43 @@ tr:hover td { color: var(--white); }
     flex-shrink: 0;
 }
 
+.th-remove,
+.td-remove {
+    width: 1%;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.row-remove {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--line-bright);
+    color: var(--dimmer);
+    cursor: pointer;
+    transition: color 0.25s var(--ease-soft), border-color 0.25s var(--ease-soft), background 0.25s var(--ease-soft), transform 0.2s var(--ease-soft);
+}
+
+.row-remove svg {
+    width: 11px;
+    height: 11px;
+    display: block;
+}
+
+.row-remove:hover {
+    color: var(--black);
+    background: var(--white);
+    border-color: var(--white);
+}
+
+.row-remove:active {
+    transform: scale(0.92);
+}
+
 .empty-state {
     text-align: center;
     padding: 80px 20px;
