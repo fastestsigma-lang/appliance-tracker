@@ -11,13 +11,13 @@
 <body>
     <div class="container">
         <header>
-            <h1> Add Your Appliance</h1>
-            <p>Help others by sharing your appliance's energy usage</p>
+            <h1>ADD YOUR APPLIANCE</h1>
+            <p>Share your appliance's energy usage with the community</p>
         </header>
 
         <nav>
-            <a href="index.html">📊 Dashboard</a>
-            <a href="submit.html" class="active">➕ Add Appliance</a>
+            <a href="index.html">Dashboard</a>
+            <a href="submit.html" class="active">Add Appliance</a>
         </nav>
 
         <form id="applianceForm" class="form-container">
@@ -65,23 +65,22 @@
                 <textarea id="notes" rows="3" placeholder="Any details about usage patterns..."></textarea>
             </div>
 
-            <button type="submit" class="submit-btn">📤 Submit Data</button>
+            <button type="submit" class="submit-btn">Submit Data</button>
         </form>
 
         <div id="successMessage" class="success-message" style="display: none;">
-            ✅ Thank you! Your data has been submitted and saved.
+            ✓ Data submitted successfully
         </div>
     </div>
 
     <script>
-        // PASTE YOUR FIREBASE CONFIG HERE (same as index.html)
         const firebaseConfig = {
-          apiKey: "AIzaSyBhZmLP6iim7woNW8ofjNu2d9OQtogACbU",
-          authDomain: "appliance-tracker-ac31a.firebaseapp.com",
-          projectId: "appliance-tracker-ac31a",
-          storageBucket: "appliance-tracker-ac31a.firebasestorage.app",
-          messagingSenderId: "94689910263",
-          appId: "1:94689910263:web:272206295a7c774d1462f2",
+            apiKey: "AIzaSyBhZmLP6iim7woNW8ofjNu2d9OQtogACbU",
+            authDomain: "appliance-tracker-ac31a.firebaseapp.com",
+            projectId: "appliance-tracker-ac31a",
+            storageBucket: "appliance-tracker-ac31a.firebasestorage.app",
+            messagingSenderId: "94689910263",
+            appId: "1:94689910263:web:272206295a7c774d1462f2"
         };
 
         firebase.initializeApp(firebaseConfig);
