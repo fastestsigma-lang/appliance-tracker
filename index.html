@@ -14,7 +14,11 @@
 
         <header class="instrument-rail">
             <div class="rail-mark">
-                <div class="rail-mark-glyph"></div>
+                <div class="rail-mark-glyph">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                    </svg>
+                </div>
                 <div>
                     <div class="rail-name">ENERGY&nbsp;TRACKER</div>
                     <div class="rail-sub">Domestic Load Registry</div>
@@ -29,10 +33,9 @@
         <section class="page-head">
             <div class="page-eyebrow">Community Instrument · Live Registry</div>
             <h1 class="page-title">Load Dashboard</h1>
-            <p class="page-desc">Aggregate appliance consumption, submitted and compared across the community in real time.</p>
+            <p class="page-desc">See what everyone else is using. We're building a real picture of home energy use—one appliance at a time.</p>
         </section>
 
-        <!-- Signature element: live load trace -->
         <div class="trace-panel">
             <div class="trace-head">
                 <div>
@@ -102,29 +105,41 @@
                 </div>
                 <div class="control-group">
                     <label class="control-label">Filter by Type</label>
-                    <select id="typeFilter" class="control-select">
-                        <option value="">All Types</option>
-                    </select>
+                    <div class="custom-dropdown" data-target="typeFilter">
+                        <div class="dropdown-trigger">
+                            <span class="dropdown-value placeholder">All Types</span>
+                            <div class="dropdown-arrow"></div>
+                        </div>
+                        <div class="dropdown-menu" id="typeDropdownMenu">
+                            <div class="dropdown-option is-selected" data-value="">All Types</div>
+                        </div>
+                        <select id="typeFilter" class="control-select" style="display:none;">
+                            <option value="">All Types</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="custom-dropdown" data-target="ageFilter">
-                    <div class="dropdown-trigger">
-                        <span class="dropdown-value placeholder">All Ages</span>
-                        <div class="dropdown-arrow"></div>
+                <div class="control-group">
+                    <label class="control-label">Filter by Age</label>
+                    <div class="custom-dropdown" data-target="ageFilter">
+                        <div class="dropdown-trigger">
+                            <span class="dropdown-value placeholder">All Ages</span>
+                            <div class="dropdown-arrow"></div>
+                        </div>
+                        <div class="dropdown-menu">
+                            <div class="dropdown-option is-selected" data-value="">All Ages</div>
+                            <div class="dropdown-option" data-value="0-2 years">0-2 years</div>
+                            <div class="dropdown-option" data-value="3-5 years">3-5 years</div>
+                            <div class="dropdown-option" data-value="6-10 years">6-10 years</div>
+                            <div class="dropdown-option" data-value="10+ years">10+ years</div>
+                        </div>
+                        <select id="ageFilter" class="control-select" style="display:none;">
+                            <option value="">All Ages</option>
+                            <option value="0-2 years">0-2 years</option>
+                            <option value="3-5 years">3-5 years</option>
+                            <option value="6-10 years">6-10 years</option>
+                            <option value="10+ years">10+ years</option>
+                        </select>
                     </div>
-                    <div class="dropdown-menu">
-                        <div class="dropdown-option is-selected" data-value="">All Ages</div>
-                        <div class="dropdown-option" data-value="0-2 years">0-2 years</div>
-                        <div class="dropdown-option" data-value="3-5 years">3-5 years</div>
-                        <div class="dropdown-option" data-value="6-10 years">6-10 years</div>
-                        <div class="dropdown-option" data-value="10+ years">10+ years</div>
-                    </div>
-                    <select id="ageFilter" class="control-select" style="display:none;">
-                        <option value="">All Ages</option>
-                        <option value="0-2 years">0-2 years</option>
-                        <option value="3-5 years">3-5 years</option>
-                        <option value="6-10 years">6-10 years</option>
-                        <option value="10+ years">10+ years</option>
-                    </select>
                 </div>
             </div>
         </div>
@@ -267,14 +282,42 @@
         }
 
         function populateFilters() {
+            const typeDropdownMenu = document.getElementById('typeDropdownMenu');
             const typeFilter = document.getElementById('typeFilter');
             const uniqueTypes = [...new Set(appliances.map(a => a.type))].sort();
 
             typeFilter.innerHTML = '<option value="">All Types</option>';
+            typeDropdownMenu.innerHTML = '<div class="dropdown-option is-selected" data-value="">All Types</div>';
+            
             uniqueTypes.forEach(type => {
                 if (type) {
                     typeFilter.innerHTML += `<option value="${type}">${type}</option>`;
+                    typeDropdownMenu.innerHTML += `<div class="dropdown-option" data-value="${type}">${type}</div>`;
                 }
+            });
+
+            // Re-attach click handlers for new options
+            typeDropdownMenu.querySelectorAll('.dropdown-option').forEach(option => {
+                option.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const val = option.getAttribute('data-value');
+                    const trigger = option.closest('.custom-dropdown').querySelector('.dropdown-trigger');
+                    const valueSpan = trigger.querySelector('.dropdown-value');
+                    const hiddenSelect = option.closest('.custom-dropdown').querySelector('select');
+
+                    valueSpan.textContent = option.textContent;
+                    if (val === '') valueSpan.classList.add('placeholder');
+                    else valueSpan.classList.remove('placeholder');
+
+                    typeDropdownMenu.querySelectorAll('.dropdown-option').forEach(o => o.classList.remove('is-selected'));
+                    option.classList.add('is-selected');
+
+                    hiddenSelect.value = val;
+                    hiddenSelect.dispatchEvent(new Event('change'));
+
+                    trigger.classList.remove('is-open');
+                    option.closest('.dropdown-menu').classList.remove('is-visible');
+                });
             });
         }
 
@@ -300,6 +343,17 @@
             document.getElementById('searchInput').value = '';
             document.getElementById('typeFilter').value = '';
             document.getElementById('ageFilter').value = '';
+
+            // Reset custom dropdown visuals
+            document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
+                const valueSpan = dropdown.querySelector('.dropdown-value');
+                const options = dropdown.querySelectorAll('.dropdown-option');
+                valueSpan.textContent = options[0].textContent;
+                valueSpan.classList.add('placeholder');
+                options.forEach(o => o.classList.remove('is-selected'));
+                options[0].classList.add('is-selected');
+            });
+
             filteredAppliances = [...appliances];
             updateDashboard();
         }
@@ -500,6 +554,59 @@
         document.getElementById('searchInput').addEventListener('input', applyFilters);
         document.getElementById('typeFilter').addEventListener('change', applyFilters);
         document.getElementById('ageFilter').addEventListener('change', applyFilters);
+
+        // Custom dropdown logic
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
+                const trigger = dropdown.querySelector('.dropdown-trigger');
+                const menu = dropdown.querySelector('.dropdown-menu');
+                const hiddenSelect = dropdown.querySelector('select');
+                const options = dropdown.querySelectorAll('.dropdown-option');
+
+                trigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const isOpen = trigger.classList.contains('is-open');
+                    
+                    document.querySelectorAll('.custom-dropdown').forEach(d => {
+                        d.querySelector('.dropdown-trigger').classList.remove('is-open');
+                        d.querySelector('.dropdown-menu').classList.remove('is-visible');
+                    });
+
+                    if (!isOpen) {
+                        trigger.classList.add('is-open');
+                        menu.classList.add('is-visible');
+                    }
+                });
+
+                options.forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const val = option.getAttribute('data-value');
+                        const valueSpan = trigger.querySelector('.dropdown-value');
+                        
+                        valueSpan.textContent = option.textContent;
+                        if (val === '') valueSpan.classList.add('placeholder');
+                        else valueSpan.classList.remove('placeholder');
+
+                        options.forEach(o => o.classList.remove('is-selected'));
+                        option.classList.add('is-selected');
+
+                        hiddenSelect.value = val;
+                        hiddenSelect.dispatchEvent(new Event('change'));
+
+                        trigger.classList.remove('is-open');
+                        menu.classList.remove('is-visible');
+                    });
+                });
+            });
+
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.custom-dropdown').forEach(d => {
+                    d.querySelector('.dropdown-trigger').classList.remove('is-open');
+                    d.querySelector('.dropdown-menu').classList.remove('is-visible');
+                });
+            });
+        });
 
         loadData();
     </script>
