@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Energy Tracker - Appliance Comparison</title>
+    <title>Home Energy Tracker</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -12,13 +12,13 @@
 <body>
     <div class="container">
         <header>
-            <h1>🔌 Home Energy Tracker</h1>
-            <p>Compare your appliance energy usage with others</p>
+            <h1> HOME ENERGY TRACKER</h1>
+            <p>Compare appliance energy usage with the community</p>
         </header>
 
         <nav>
-            <a href="index.html" class="active">📊 Dashboard</a>
-            <a href="submit.html">➕ Add Appliance</a>
+            <a href="index.html" class="active">Dashboard</a>
+            <a href="submit.html">Add Appliance</a>
         </nav>
 
         <div class="stats-grid">
@@ -30,16 +30,55 @@
                 <h3>Avg Monthly Usage</h3>
                 <p id="avgUsage">0 kWh</p>
             </div>
+            <div class="stat-card">
+                <h3>Appliance Types</h3>
+                <p id="applianceTypes">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Highest Usage</h3>
+                <p id="highestUsage">0 kWh</p>
+            </div>
+        </div>
+
+        <div class="controls-container">
+            <h2>Filter & Search</h2>
+            <div class="controls-grid">
+                <div class="control-group">
+                    <label for="searchInput">Search by Model</label>
+                    <input type="text" id="searchInput" placeholder="e.g., Samsung">
+                </div>
+                <div class="control-group">
+                    <label for="typeFilter">Filter by Type</label>
+                    <select id="typeFilter">
+                        <option value="">All Types</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="ageFilter">Filter by Age</label>
+                    <select id="ageFilter">
+                        <option value="">All Ages</option>
+                        <option value="0-2 years">0-2 years</option>
+                        <option value="3-5 years">3-5 years</option>
+                        <option value="6-10 years">6-10 years</option>
+                        <option value="10+ years">10+ years</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>&nbsp;</label>
+                    <button class="btn" onclick="exportData()">Export CSV</button>
+                </div>
+            </div>
         </div>
 
         <div class="chart-container">
-            <h2>📈 Average Energy Usage by Appliance Type</h2>
+            <h2>Average Energy Usage by Type</h2>
             <canvas id="usageChart"></canvas>
         </div>
 
         <div class="table-container">
-            <h2>📋 Recent Submissions</h2>
-            <table id="submissionsTable">
+            <h2>Recent Submissions</h2>
+            <div id="loadingMessage" class="loading">Loading data</div>
+            <table id="submissionsTable" style="display: none;">
                 <thead>
                     <tr>
                         <th>Appliance</th>
@@ -56,62 +95,70 @@
 
     <script>
         const firebaseConfig = {
-          apiKey: "AIzaSyBhZmLP6iim7woNW8ofjNu2d9OQtogACbU",
-          authDomain: "appliance-tracker-ac31a.firebaseapp.com",
-          projectId: "appliance-tracker-ac31a",
-          storageBucket: "appliance-tracker-ac31a.firebasestorage.app",
-          messagingSenderId: "94689910263",
-          appId: "1:94689910263:web:272206295a7c774d1462f2",
+            apiKey: "AIzaSyBhZmLP6iim7woNW8ofjNu2d9OQtogACbU",
+            authDomain: "appliance-tracker-ac31a.firebaseapp.com",
+            projectId: "appliance-tracker-ac31a",
+            storageBucket: "appliance-tracker-ac31a.firebasestorage.app",
+            messagingSenderId: "94689910263",
+            appId: "1:94689910263:web:272206295a7c774d1462f2"
         };
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
         let appliances = [];
+        let filteredAppliances = [];
 
         async function loadData() {
             try {
-                console.log("Fetching data from Firebase...");
-                // Removed orderBy to prevent index errors, we will sort in JS instead
                 const snapshot = await db.collection('appliances').get();
-                
                 appliances = [];
                 snapshot.forEach(doc => {
                     appliances.push({ id: doc.id, ...doc.data() });
                 });
-                
-                console.log("Found " + appliances.length + " appliances:", appliances);
 
-                // Sort by date in JavaScript (newest first)
                 appliances.sort((a, b) => {
                     const dateA = new Date(a.date || 0);
                     const dateB = new Date(b.date || 0);
                     return dateB - dateA;
                 });
-                
+
+                filteredAppliances = [...appliances];
                 updateDashboard();
+                populateFilters();
+                
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('submissionsTable').style.display = 'table';
             } catch (error) {
                 console.error('Error loading data:', error);
-                document.getElementById('totalSubmissions').textContent = 'Error: ' + error.message;
+                document.getElementById('loadingMessage').textContent = 'Error loading data';
             }
         }
 
         function updateDashboard() {
-            document.getElementById('totalSubmissions').textContent = appliances.length;
-            
-            if (appliances.length > 0) {
-                const totalUsage = appliances.reduce((sum, a) => sum + (parseFloat(a.usage) || 0), 0);
-                const avg = (totalUsage / appliances.length).toFixed(1);
+            document.getElementById('totalSubmissions').textContent = filteredAppliances.length;
+
+            if (filteredAppliances.length > 0) {
+                const totalUsage = filteredAppliances.reduce((sum, a) => sum + (parseFloat(a.usage) || 0), 0);
+                const avg = (totalUsage / filteredAppliances.length).toFixed(1);
                 document.getElementById('avgUsage').textContent = `${avg} kWh`;
+
+                const highest = Math.max(...filteredAppliances.map(a => parseFloat(a.usage) || 0));
+                document.getElementById('highestUsage').textContent = `${highest} kWh`;
+
+                const uniqueTypes = new Set(filteredAppliances.map(a => a.type));
+                document.getElementById('applianceTypes').textContent = uniqueTypes.size;
             } else {
-                document.getElementById('avgUsage').textContent = `0 kWh`;
+                document.getElementById('avgUsage').textContent = '0 kWh';
+                document.getElementById('highestUsage').textContent = '0 kWh';
+                document.getElementById('applianceTypes').textContent = '0';
             }
 
             const tbody = document.getElementById('tableBody');
-            if (appliances.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No submissions yet. Be the first!</td></tr>';
+            if (filteredAppliances.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-secondary);">No submissions found</td></tr>';
             } else {
-                tbody.innerHTML = appliances.slice(0, 20).map(app => `
+                tbody.innerHTML = filteredAppliances.slice(0, 50).map(app => `
                     <tr>
                         <td>${app.type || 'Unknown'}</td>
                         <td>${app.model || 'Not specified'}</td>
@@ -125,11 +172,41 @@
             updateChart();
         }
 
+        function populateFilters() {
+            const typeFilter = document.getElementById('typeFilter');
+            const uniqueTypes = [...new Set(appliances.map(a => a.type))].sort();
+            
+            typeFilter.innerHTML = '<option value="">All Types</option>';
+            uniqueTypes.forEach(type => {
+                if (type) {
+                    typeFilter.innerHTML += `<option value="${type}">${type}</option>`;
+                }
+            });
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const typeFilter = document.getElementById('typeFilter').value;
+            const ageFilter = document.getElementById('ageFilter').value;
+
+            filteredAppliances = appliances.filter(app => {
+                const matchesSearch = !search || 
+                    (app.model && app.model.toLowerCase().includes(search)) ||
+                    (app.type && app.type.toLowerCase().includes(search));
+                const matchesType = !typeFilter || app.type === typeFilter;
+                const matchesAge = !ageFilter || app.age === ageFilter;
+                
+                return matchesSearch && matchesType && matchesAge;
+            });
+
+            updateDashboard();
+        }
+
         function updateChart() {
             const ctx = document.getElementById('usageChart').getContext('2d');
             
             const byType = {};
-            appliances.forEach(app => {
+            filteredAppliances.forEach(app => {
                 if (!byType[app.type]) {
                     byType[app.type] = { total: 0, count: 0 };
                 }
@@ -137,12 +214,11 @@
                 byType[app.type].count++;
             });
 
-            const labels = Object.keys(byType);
+            const labels = Object.keys(byType).sort();
             const averages = labels.map(type => 
                 (byType[type].total / byType[type].count).toFixed(1)
             );
 
-            // Destroy old chart if it exists to prevent overlapping
             if (window.myChart) {
                 window.myChart.destroy();
             }
@@ -154,20 +230,77 @@
                     datasets: [{
                         label: 'Average Monthly Usage (kWh)',
                         data: averages,
-                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40']
+                        backgroundColor: '#ffffff',
+                        borderColor: '#ffffff',
+                        borderWidth: 1
                     }]
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            title: { display: true, text: 'kWh per month' }
+                            grid: {
+                                color: '#222222'
+                            },
+                            ticks: {
+                                color: '#888888'
+                            },
+                            title: {
+                                display: true,
+                                text: 'kWh per month',
+                                color: '#888888'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: '#222222'
+                            },
+                            ticks: {
+                                color: '#888888'
+                            }
                         }
                     }
                 }
             });
         }
+
+        function exportData() {
+            if (filteredAppliances.length === 0) {
+                alert('No data to export');
+                return;
+            }
+
+            const csv = [
+                ['Type', 'Model', 'Usage (kWh)', 'Age', 'Date', 'Notes'],
+                ...filteredAppliances.map(app => [
+                    app.type || '',
+                    app.model || '',
+                    app.usage || 0,
+                    app.age || '',
+                    app.date ? new Date(app.date).toLocaleDateString() : '',
+                    app.notes || ''
+                ])
+            ].map(row => row.join(',')).join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `energy-data-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+        document.getElementById('typeFilter').addEventListener('change', applyFilters);
+        document.getElementById('ageFilter').addEventListener('change', applyFilters);
 
         loadData();
     </script>
