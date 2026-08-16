@@ -10,87 +10,131 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1> HOME ENERGY TRACKER</h1>
-            <p>Compare appliance energy usage with the community</p>
-        </header>
+    <div class="app-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">Energy Tracker</div>
+                <div class="sidebar-tagline">Community-powered insights</div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="index.html" class="nav-item active">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="submit.html" class="nav-item">
+                    <span class="nav-icon">➕</span>
+                    <span>Add Appliance</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div>Built with care</div>
+                <div style="margin-top: 4px;">© 2026</div>
+            </div>
+        </aside>
 
-        <nav>
-            <a href="index.html" class="active">Dashboard</a>
-            <a href="submit.html">Add Appliance</a>
-        </nav>
+        <main class="main-content">
+            <header class="page-header">
+                <h1 class="page-title">Dashboard</h1>
+                <p class="page-subtitle">Track and compare appliance energy usage across the community</p>
+            </header>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3>Total Submissions</h3>
-                <p id="totalSubmissions">0</p>
-            </div>
-            <div class="stat-card">
-                <h3>Avg Monthly Usage</h3>
-                <p id="avgUsage">0 kWh</p>
-            </div>
-            <div class="stat-card">
-                <h3>Appliance Types</h3>
-                <p id="applianceTypes">0</p>
-            </div>
-            <div class="stat-card">
-                <h3>Highest Usage</h3>
-                <p id="highestUsage">0 kWh</p>
-            </div>
-        </div>
-
-        <div class="controls-container">
-            <h2>Filter & Search</h2>
-            <div class="controls-grid">
-                <div class="control-group">
-                    <label for="searchInput">Search by Model</label>
-                    <input type="text" id="searchInput" placeholder="e.g., Samsung">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Submissions</div>
+                    <div class="stat-value" id="totalSubmissions">0</div>
                 </div>
-                <div class="control-group">
-                    <label for="typeFilter">Filter by Type</label>
-                    <select id="typeFilter">
-                        <option value="">All Types</option>
-                    </select>
+                <div class="stat-card">
+                    <div class="stat-label">Avg Monthly Usage</div>
+                    <div class="stat-value">
+                        <span id="avgUsage">0</span>
+                        <span class="stat-unit">kWh</span>
+                    </div>
                 </div>
-                <div class="control-group">
-                    <label for="ageFilter">Filter by Age</label>
-                    <select id="ageFilter">
-                        <option value="">All Ages</option>
-                        <option value="0-2 years">0-2 years</option>
-                        <option value="3-5 years">3-5 years</option>
-                        <option value="6-10 years">6-10 years</option>
-                        <option value="10+ years">10+ years</option>
-                    </select>
+                <div class="stat-card">
+                    <div class="stat-label">Appliance Types</div>
+                    <div class="stat-value" id="applianceTypes">0</div>
                 </div>
-                <div class="control-group">
-                    <label>&nbsp;</label>
-                    <button class="btn" onclick="exportData()">Export CSV</button>
+                <div class="stat-card">
+                    <div class="stat-label">Highest Usage</div>
+                    <div class="stat-value">
+                        <span id="highestUsage">0</span>
+                        <span class="stat-unit">kWh</span>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="chart-container">
-            <h2>Average Energy Usage by Type</h2>
-            <canvas id="usageChart"></canvas>
-        </div>
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Filter & Search</h2>
+                    <div class="section-actions">
+                        <button class="btn" onclick="resetFilters()">Reset</button>
+                        <button class="btn btn-primary" onclick="exportData()">↓ Export CSV</button>
+                    </div>
+                </div>
+                
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label class="control-label">Search by Model</label>
+                        <input type="text" id="searchInput" class="control-input" placeholder="e.g., Samsung">
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Filter by Type</label>
+                        <select id="typeFilter" class="control-select">
+                            <option value="">All Types</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Filter by Age</label>
+                        <select id="ageFilter" class="control-select">
+                            <option value="">All Ages</option>
+                            <option value="0-2 years">0-2 years</option>
+                            <option value="3-5 years">3-5 years</option>
+                            <option value="6-10 years">6-10 years</option>
+                            <option value="10+ years">10+ years</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
-        <div class="table-container">
-            <h2>Recent Submissions</h2>
-            <div id="loadingMessage" class="loading">Loading data</div>
-            <table id="submissionsTable" style="display: none;">
-                <thead>
-                    <tr>
-                        <th>Appliance</th>
-                        <th>Brand/Model</th>
-                        <th>Monthly Usage (kWh)</th>
-                        <th>Age</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody"></tbody>
-            </table>
-        </div>
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Usage by Appliance Type</h2>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="usageChart"></canvas>
+                </div>
+            </div>
+
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Recent Submissions</h2>
+                    <div class="section-actions">
+                        <span id="resultCount" style="color: var(--text-muted); font-size: 0.9em;"></span>
+                    </div>
+                </div>
+                
+                <div id="loadingState" class="loading">Loading data</div>
+                
+                <div id="tableContainer" style="display: none;">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Appliance</th>
+                                    <th>Brand/Model</th>
+                                    <th>Monthly Usage</th>
+                                    <th>Age</th>
+                                    <th>Submitted</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
     <script>
@@ -127,11 +171,11 @@
                 updateDashboard();
                 populateFilters();
                 
-                document.getElementById('loadingMessage').style.display = 'none';
-                document.getElementById('submissionsTable').style.display = 'table';
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('tableContainer').style.display = 'block';
             } catch (error) {
                 console.error('Error loading data:', error);
-                document.getElementById('loadingMessage').textContent = 'Error loading data';
+                document.getElementById('loadingState').textContent = 'Error loading data';
             }
         }
 
@@ -141,28 +185,39 @@
             if (filteredAppliances.length > 0) {
                 const totalUsage = filteredAppliances.reduce((sum, a) => sum + (parseFloat(a.usage) || 0), 0);
                 const avg = (totalUsage / filteredAppliances.length).toFixed(1);
-                document.getElementById('avgUsage').textContent = `${avg} kWh`;
+                document.getElementById('avgUsage').textContent = avg;
 
                 const highest = Math.max(...filteredAppliances.map(a => parseFloat(a.usage) || 0));
-                document.getElementById('highestUsage').textContent = `${highest} kWh`;
+                document.getElementById('highestUsage').textContent = highest;
 
                 const uniqueTypes = new Set(filteredAppliances.map(a => a.type));
                 document.getElementById('applianceTypes').textContent = uniqueTypes.size;
             } else {
-                document.getElementById('avgUsage').textContent = '0 kWh';
-                document.getElementById('highestUsage').textContent = '0 kWh';
+                document.getElementById('avgUsage').textContent = '0';
+                document.getElementById('highestUsage').textContent = '0';
                 document.getElementById('applianceTypes').textContent = '0';
             }
 
             const tbody = document.getElementById('tableBody');
+            document.getElementById('resultCount').textContent = `Showing ${filteredAppliances.length} of ${appliances.length}`;
+            
             if (filteredAppliances.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-secondary);">No submissions found</td></tr>';
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📭</div>
+                                <div>No submissions found</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
             } else {
                 tbody.innerHTML = filteredAppliances.slice(0, 50).map(app => `
                     <tr>
-                        <td>${app.type || 'Unknown'}</td>
+                        <td><strong>${app.type || 'Unknown'}</strong></td>
                         <td>${app.model || 'Not specified'}</td>
-                        <td>${app.usage || 0} kWh</td>
+                        <td><span style="font-family: 'JetBrains Mono', monospace;">${app.usage || 0}</span> kWh</td>
                         <td>${app.age || 'N/A'}</td>
                         <td>${app.date ? new Date(app.date).toLocaleDateString() : 'N/A'}</td>
                     </tr>
@@ -202,6 +257,14 @@
             updateDashboard();
         }
 
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('typeFilter').value = '';
+            document.getElementById('ageFilter').value = '';
+            filteredAppliances = [...appliances];
+            updateDashboard();
+        }
+
         function updateChart() {
             const ctx = document.getElementById('usageChart').getContext('2d');
             
@@ -230,14 +293,16 @@
                     datasets: [{
                         label: 'Average Monthly Usage (kWh)',
                         data: averages,
-                        backgroundColor: '#ffffff',
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
                         borderColor: '#ffffff',
-                        borderWidth: 1
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        borderSkipped: false
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: {
                             display: false
@@ -247,25 +312,40 @@
                         y: {
                             beginAtZero: true,
                             grid: {
-                                color: '#222222'
+                                color: 'rgba(255, 255, 255, 0.05)'
                             },
                             ticks: {
-                                color: '#888888'
+                                color: '#666666',
+                                font: {
+                                    family: 'JetBrains Mono',
+                                    size: 11
+                                }
                             },
                             title: {
                                 display: true,
                                 text: 'kWh per month',
-                                color: '#888888'
+                                color: '#666666',
+                                font: {
+                                    size: 12
+                                }
                             }
                         },
                         x: {
                             grid: {
-                                color: '#222222'
+                                display: false
                             },
                             ticks: {
-                                color: '#888888'
+                                color: '#666666',
+                                font: {
+                                    family: 'Inter',
+                                    size: 12
+                                }
                             }
                         }
+                    },
+                    animation: {
+                        duration: 800,
+                        easing: 'easeOutQuart'
                     }
                 }
             });
@@ -287,7 +367,7 @@
                     app.date ? new Date(app.date).toLocaleDateString() : '',
                     app.notes || ''
                 ])
-            ].map(row => row.join(',')).join('\n');
+            ].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
 
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
