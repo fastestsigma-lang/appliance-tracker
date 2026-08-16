@@ -876,3 +876,20 @@ tr:hover td { color: var(--white); }
     .panel-actions { width: 100%; }
     .btn { flex: 1; justify-content: center; }
 }
+
+/* =========================================
+   FIX: Force dropdowns to use light mode colors
+   to prevent OS dark mode from making text invisible
+   ========================================= */
+.control-select,
+.form-select,
+select {
+    color-scheme: light !important;
+}
+
+.control-select option,
+.form-select option,
+select option {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
