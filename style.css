@@ -656,48 +656,41 @@ tr:hover td { color: var(--white); }
 
 .row-remove {
     position: relative;
-    width: 28px;
-    height: 28px;
-    padding: 0;
-    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: 0.7em;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 8px 16px;
     background: transparent;
     border: 1px solid var(--line-bright);
+    color: var(--dim);
     cursor: pointer;
-    transition: border-color 0.25s var(--ease-soft), background 0.25s var(--ease-soft), transform 0.2s var(--ease-soft);
-}
-
-.row-remove::before,
-.row-remove::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 12px;
-    height: 1.3px;
-    background: var(--dimmer);
-    transition: background 0.25s var(--ease-soft);
+    overflow: hidden;
+    isolation: isolate;
+    transition: color 0.3s var(--ease-soft), border-color 0.3s var(--ease-soft);
 }
 
 .row-remove::before {
-    transform: translate(-50%, -50%) rotate(45deg);
-}
-
-.row-remove::after {
-    transform: translate(-50%, -50%) rotate(-45deg);
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--white);
+    transform: translateY(101%);
+    transition: transform 0.3s var(--ease);
+    z-index: -1;
 }
 
 .row-remove:hover {
-    background: var(--white);
+    color: var(--black);
     border-color: var(--white);
 }
 
-.row-remove:hover::before,
-.row-remove:hover::after {
-    background: var(--black);
+.row-remove:hover::before {
+    transform: translateY(0%);
 }
 
 .row-remove:active {
-    transform: scale(0.92);
+    transform: scale(0.96);
 }
 
 .empty-state {
