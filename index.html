@@ -10,131 +10,153 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app-layout">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-logo">Energy Tracker</div>
-                <div class="sidebar-tagline">Community-powered insights</div>
+    <div class="app-shell">
+
+        <header class="instrument-rail">
+            <div class="rail-mark">
+                <div class="rail-mark-glyph"></div>
+                <div>
+                    <div class="rail-name">ENERGY&nbsp;TRACKER</div>
+                    <div class="rail-sub">Domestic Load Registry</div>
+                </div>
             </div>
-            
-            <nav class="sidebar-nav">
-                <a href="index.html" class="nav-item active">
-                    <span class="nav-icon">📊</span>
-                    <span>Dashboard</span>
-                </a>
-                <a href="submit.html" class="nav-item">
-                    <span class="nav-icon">➕</span>
-                    <span>Add Appliance</span>
-                </a>
+            <nav class="rail-nav">
+                <a href="index.html" class="rail-link is-active"><span class="tick"></span><span class="label-text">Dashboard</span></a>
+                <a href="submit.html" class="rail-link"><span class="tick"></span><span class="label-text">Add Appliance</span></a>
             </nav>
-            
-            <div class="sidebar-footer">
-                <div>Built with care</div>
-                <div style="margin-top: 4px;">© 2026</div>
+        </header>
+
+        <section class="page-head">
+            <div class="page-eyebrow">Community Instrument · Live Registry</div>
+            <h1 class="page-title">Load Dashboard</h1>
+            <p class="page-desc">Aggregate appliance consumption, submitted and compared across the community in real time.</p>
+        </section>
+
+        <!-- Signature element: live load trace -->
+        <div class="trace-panel">
+            <div class="trace-head">
+                <div>
+                    <div class="trace-label">Composite Load Trace</div>
+                </div>
+                <div class="trace-readout"><span id="traceReadout">—</span><span class="unit">kWh avg</span></div>
             </div>
-        </aside>
-
-        <main class="main-content">
-            <header class="page-header">
-                <h1 class="page-title">Dashboard</h1>
-                <p class="page-subtitle">Track and compare appliance energy usage across the community</p>
-            </header>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Total Submissions</div>
-                    <div class="stat-value" id="totalSubmissions">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Avg Monthly Usage</div>
-                    <div class="stat-value">
-                        <span id="avgUsage">0</span>
-                        <span class="stat-unit">kWh</span>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Appliance Types</div>
-                    <div class="stat-value" id="applianceTypes">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Highest Usage</div>
-                    <div class="stat-value">
-                        <span id="highestUsage">0</span>
-                        <span class="stat-unit">kWh</span>
-                    </div>
-                </div>
+            <div class="trace-svg-wrap">
+                <svg id="traceSvg" viewBox="0 0 1000 132" preserveAspectRatio="none">
+                    <defs>
+                        <linearGradient id="traceGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#f2f2f0" stop-opacity="0.35"/>
+                            <stop offset="100%" stop-color="#f2f2f0" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+                    <g class="trace-grid">
+                        <line x1="0" y1="22" x2="1000" y2="22"></line>
+                        <line x1="0" y1="66" x2="1000" y2="66"></line>
+                        <line x1="0" y1="110" x2="1000" y2="110"></line>
+                    </g>
+                    <path id="traceFillPath" class="trace-fill" d=""></path>
+                    <path id="traceLinePath" class="trace-line" d=""></path>
+                </svg>
+                <div class="trace-scan"></div>
             </div>
-
-            <div class="content-section">
-                <div class="section-header">
-                    <h2 class="section-title">Filter & Search</h2>
-                    <div class="section-actions">
-                        <button class="btn" onclick="resetFilters()">Reset</button>
-                        <button class="btn btn-primary" onclick="exportData()">↓ Export CSV</button>
-                    </div>
-                </div>
-                
-                <div class="controls-grid">
-                    <div class="control-group">
-                        <label class="control-label">Search by Model</label>
-                        <input type="text" id="searchInput" class="control-input" placeholder="e.g., Samsung">
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label">Filter by Type</label>
-                        <select id="typeFilter" class="control-select">
-                            <option value="">All Types</option>
-                        </select>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label">Filter by Age</label>
-                        <select id="ageFilter" class="control-select">
-                            <option value="">All Ages</option>
-                            <option value="0-2 years">0-2 years</option>
-                            <option value="3-5 years">3-5 years</option>
-                            <option value="6-10 years">6-10 years</option>
-                            <option value="10+ years">10+ years</option>
-                        </select>
-                    </div>
-                </div>
+            <div class="trace-foot">
+                <span id="traceFootLeft">EARLIEST SUBMISSION</span>
+                <span id="traceFootRight">LATEST SUBMISSION</span>
             </div>
+        </div>
 
-            <div class="content-section">
-                <div class="section-header">
-                    <h2 class="section-title">Usage by Appliance Type</h2>
-                </div>
-                <div class="chart-wrapper">
-                    <canvas id="usageChart"></canvas>
+        <div class="metric-grid">
+            <div class="metric">
+                <div class="metric-index">01</div>
+                <div class="metric-label">Total Submissions</div>
+                <div class="metric-value" id="totalSubmissions">0</div>
+            </div>
+            <div class="metric">
+                <div class="metric-index">02</div>
+                <div class="metric-label">Avg Monthly Usage</div>
+                <div class="metric-value"><span id="avgUsage">0</span><span class="unit">kWh</span></div>
+            </div>
+            <div class="metric">
+                <div class="metric-index">03</div>
+                <div class="metric-label">Appliance Types</div>
+                <div class="metric-value" id="applianceTypes">0</div>
+            </div>
+            <div class="metric">
+                <div class="metric-index">04</div>
+                <div class="metric-label">Highest Usage</div>
+                <div class="metric-value"><span id="highestUsage">0</span><span class="unit">kWh</span></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-head">
+                <h2 class="panel-title">Filter &amp; Search</h2>
+                <div class="panel-actions">
+                    <button class="btn" onclick="resetFilters()">Reset</button>
+                    <button class="btn btn-primary" onclick="exportData()">Export CSV <span class="btn-icon">↓</span></button>
                 </div>
             </div>
-
-            <div class="content-section">
-                <div class="section-header">
-                    <h2 class="section-title">Recent Submissions</h2>
-                    <div class="section-actions">
-                        <span id="resultCount" style="color: var(--text-muted); font-size: 0.9em;"></span>
-                    </div>
+            <div class="controls-grid">
+                <div class="control-group">
+                    <label class="control-label">Search by Model</label>
+                    <input type="text" id="searchInput" class="control-input" placeholder="e.g., Samsung">
                 </div>
-                
-                <div id="loadingState" class="loading">Loading data</div>
-                
-                <div id="tableContainer" style="display: none;">
-                    <div class="table-wrapper">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Appliance</th>
-                                    <th>Brand/Model</th>
-                                    <th>Monthly Usage</th>
-                                    <th>Age</th>
-                                    <th>Submitted</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tableBody"></tbody>
-                        </table>
-                    </div>
+                <div class="control-group">
+                    <label class="control-label">Filter by Type</label>
+                    <select id="typeFilter" class="control-select">
+                        <option value="">All Types</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Filter by Age</label>
+                    <select id="ageFilter" class="control-select">
+                        <option value="">All Ages</option>
+                        <option value="0-2 years">0-2 years</option>
+                        <option value="3-5 years">3-5 years</option>
+                        <option value="6-10 years">6-10 years</option>
+                        <option value="10+ years">10+ years</option>
+                    </select>
                 </div>
             </div>
-        </main>
+        </div>
+
+        <div class="panel">
+            <div class="panel-head">
+                <h2 class="panel-title">Usage by Appliance Type</h2>
+            </div>
+            <div class="chart-wrapper">
+                <canvas id="usageChart"></canvas>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-head">
+                <h2 class="panel-title">Recent Submissions</h2>
+                <span id="resultCount" style="font-family: var(--font-mono); color: var(--dimmer); font-size: 0.78em; letter-spacing: 0.04em;"></span>
+            </div>
+
+            <div id="loadingState" class="loading">
+                <div class="loading-bars"><span></span><span></span><span></span><span></span></div>
+                Reading registry
+            </div>
+
+            <div id="tableContainer" style="display: none;">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Appliance</th>
+                                <th>Brand / Model</th>
+                                <th>Monthly Usage</th>
+                                <th>Age</th>
+                                <th>Submitted</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -170,12 +192,12 @@
                 filteredAppliances = [...appliances];
                 updateDashboard();
                 populateFilters();
-                
+
                 document.getElementById('loadingState').style.display = 'none';
                 document.getElementById('tableContainer').style.display = 'block';
             } catch (error) {
                 console.error('Error loading data:', error);
-                document.getElementById('loadingState').textContent = 'Error loading data';
+                document.getElementById('loadingState').innerHTML = 'Error reading registry';
             }
         }
 
@@ -186,6 +208,7 @@
                 const totalUsage = filteredAppliances.reduce((sum, a) => sum + (parseFloat(a.usage) || 0), 0);
                 const avg = (totalUsage / filteredAppliances.length).toFixed(1);
                 document.getElementById('avgUsage').textContent = avg;
+                document.getElementById('traceReadout').textContent = avg;
 
                 const highest = Math.max(...filteredAppliances.map(a => parseFloat(a.usage) || 0));
                 document.getElementById('highestUsage').textContent = highest;
@@ -194,20 +217,21 @@
                 document.getElementById('applianceTypes').textContent = uniqueTypes.size;
             } else {
                 document.getElementById('avgUsage').textContent = '0';
+                document.getElementById('traceReadout').textContent = '—';
                 document.getElementById('highestUsage').textContent = '0';
                 document.getElementById('applianceTypes').textContent = '0';
             }
 
             const tbody = document.getElementById('tableBody');
-            document.getElementById('resultCount').textContent = `Showing ${filteredAppliances.length} of ${appliances.length}`;
-            
+            document.getElementById('resultCount').textContent = `SHOWING ${filteredAppliances.length} OF ${appliances.length}`;
+
             if (filteredAppliances.length === 0) {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="5">
                             <div class="empty-state">
-                                <div class="empty-state-icon">📭</div>
-                                <div>No submissions found</div>
+                                <div class="empty-state-mark">//</div>
+                                <div>No submissions match this filter</div>
                             </div>
                         </td>
                     </tr>
@@ -215,9 +239,9 @@
             } else {
                 tbody.innerHTML = filteredAppliances.slice(0, 50).map(app => `
                     <tr>
-                        <td><strong>${app.type || 'Unknown'}</strong></td>
+                        <td><span class="type-tag">${app.type || 'Unknown'}</span></td>
                         <td>${app.model || 'Not specified'}</td>
-                        <td><span style="font-family: 'JetBrains Mono', monospace;">${app.usage || 0}</span> kWh</td>
+                        <td><span class="num">${app.usage || 0}</span> kWh</td>
                         <td>${app.age || 'N/A'}</td>
                         <td>${app.date ? new Date(app.date).toLocaleDateString() : 'N/A'}</td>
                     </tr>
@@ -225,12 +249,13 @@
             }
 
             updateChart();
+            updateTrace();
         }
 
         function populateFilters() {
             const typeFilter = document.getElementById('typeFilter');
             const uniqueTypes = [...new Set(appliances.map(a => a.type))].sort();
-            
+
             typeFilter.innerHTML = '<option value="">All Types</option>';
             uniqueTypes.forEach(type => {
                 if (type) {
@@ -245,12 +270,12 @@
             const ageFilter = document.getElementById('ageFilter').value;
 
             filteredAppliances = appliances.filter(app => {
-                const matchesSearch = !search || 
+                const matchesSearch = !search ||
                     (app.model && app.model.toLowerCase().includes(search)) ||
                     (app.type && app.type.toLowerCase().includes(search));
                 const matchesType = !typeFilter || app.type === typeFilter;
                 const matchesAge = !ageFilter || app.age === ageFilter;
-                
+
                 return matchesSearch && matchesType && matchesAge;
             });
 
@@ -267,7 +292,7 @@
 
         function updateChart() {
             const ctx = document.getElementById('usageChart').getContext('2d');
-            
+
             const byType = {};
             filteredAppliances.forEach(app => {
                 if (!byType[app.type]) {
@@ -278,7 +303,7 @@
             });
 
             const labels = Object.keys(byType).sort();
-            const averages = labels.map(type => 
+            const averages = labels.map(type =>
                 (byType[type].total / byType[type].count).toFixed(1)
             );
 
@@ -293,62 +318,115 @@
                     datasets: [{
                         label: 'Average Monthly Usage (kWh)',
                         data: averages,
-                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                        borderColor: '#ffffff',
-                        borderWidth: 1,
-                        borderRadius: 4,
-                        borderSkipped: false
+                        backgroundColor: 'rgba(242, 242, 240, 0.9)',
+                        hoverBackgroundColor: '#f2f2f0',
+                        borderColor: '#f2f2f0',
+                        borderWidth: 0,
+                        borderRadius: 0,
+                        borderSkipped: false,
+                        maxBarThickness: 64
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            display: false
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0c0c0c',
+                            borderColor: '#3a3a3a',
+                            borderWidth: 1,
+                            titleColor: '#f2f2f0',
+                            bodyColor: '#8a8a86',
+                            titleFont: { family: 'JetBrains Mono', size: 11, weight: '600' },
+                            bodyFont: { family: 'JetBrains Mono', size: 11 },
+                            padding: 12,
+                            cornerRadius: 0,
+                            displayColors: false
                         }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.05)'
-                            },
+                            grid: { color: '#1a1a1a' },
+                            border: { color: '#232323' },
                             ticks: {
-                                color: '#666666',
-                                font: {
-                                    family: 'JetBrains Mono',
-                                    size: 11
-                                }
+                                color: '#55554f',
+                                font: { family: 'JetBrains Mono', size: 11 }
                             },
                             title: {
                                 display: true,
                                 text: 'kWh per month',
-                                color: '#666666',
-                                font: {
-                                    size: 12
-                                }
+                                color: '#55554f',
+                                font: { family: 'JetBrains Mono', size: 11 }
                             }
                         },
                         x: {
-                            grid: {
-                                display: false
-                            },
+                            grid: { display: false },
+                            border: { color: '#232323' },
                             ticks: {
-                                color: '#666666',
-                                font: {
-                                    family: 'Inter',
-                                    size: 12
-                                }
+                                color: '#8a8a86',
+                                font: { family: 'Inter', size: 12 }
                             }
                         }
                     },
                     animation: {
-                        duration: 800,
-                        easing: 'easeOutQuart'
+                        duration: 900,
+                        easing: 'easeOutQuint'
                     }
                 }
             });
+        }
+
+        function updateTrace() {
+            const svg = document.getElementById('traceSvg');
+            const linePath = document.getElementById('traceLinePath');
+            const fillPath = document.getElementById('traceFillPath');
+            const footLeft = document.getElementById('traceFootLeft');
+            const footRight = document.getElementById('traceFootRight');
+
+            const points = [...filteredAppliances]
+                .filter(a => a.date)
+                .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            if (points.length === 0) {
+                linePath.setAttribute('d', 'M0,66 L1000,66');
+                fillPath.setAttribute('d', 'M0,66 L1000,66 L1000,132 L0,132 Z');
+                footLeft.textContent = 'NO DATA';
+                footRight.textContent = 'NO DATA';
+                return;
+            }
+
+            const usages = points.map(p => parseFloat(p.usage) || 0);
+            const max = Math.max(...usages, 1);
+            const min = 0;
+            const w = 1000;
+            const h = 132;
+            const padTop = 14;
+            const padBottom = 14;
+
+            const coords = points.map((p, i) => {
+                const x = points.length === 1 ? w / 2 : (i / (points.length - 1)) * w;
+                const norm = (parseFloat(p.usage) || 0 - min) / (max - min || 1);
+                const y = h - padBottom - norm * (h - padTop - padBottom);
+                return [x, y];
+            });
+
+            let d = `M${coords[0][0]},${coords[0][1]}`;
+            for (let i = 1; i < coords.length; i++) {
+                const [x0, y0] = coords[i - 1];
+                const [x1, y1] = coords[i];
+                const cx = (x0 + x1) / 2;
+                d += ` C${cx},${y0} ${cx},${y1} ${x1},${y1}`;
+            }
+
+            linePath.setAttribute('d', d);
+            fillPath.setAttribute('d', `${d} L${coords[coords.length - 1][0]},${h} L${coords[0][0]},${h} Z`);
+
+            const first = points[0];
+            const last = points[points.length - 1];
+            footLeft.textContent = first.date ? new Date(first.date).toLocaleDateString(undefined, { month: 'short', year: 'numeric' }).toUpperCase() : 'UNKNOWN';
+            footRight.textContent = last.date ? new Date(last.date).toLocaleDateString(undefined, { month: 'short', year: 'numeric' }).toUpperCase() : 'UNKNOWN';
         }
 
         function exportData() {
