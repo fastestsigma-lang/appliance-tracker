@@ -479,12 +479,30 @@ body {
 }
 
 .btn-icon {
-    font-size: 0.9em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 12px;
+    height: 12px;
     transition: transform 0.3s var(--ease-soft);
+}
+
+.btn-icon svg {
+    width: 100%;
+    height: 100%;
+    display: block;
 }
 
 .btn:hover .btn-icon {
     transform: translateX(2px);
+}
+
+.submit-btn .btn-icon {
+    transform: translateX(0);
+}
+
+.submit-btn:hover .btn-icon {
+    transform: translateX(3px);
 }
 
 /* ============ CONTROLS / FORM FIELDS ============ */
@@ -704,6 +722,10 @@ tr:hover td { color: var(--white); }
 }
 
 .submit-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     width: 100%;
     padding: 17px;
     background: var(--white);
