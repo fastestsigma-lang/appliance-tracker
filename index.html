@@ -556,58 +556,96 @@
         document.getElementById('typeFilter').addEventListener('change', applyFilters);
         document.getElementById('ageFilter').addEventListener('change', applyFilters);
 
-        // Custom dropdown logic
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
-                const trigger = dropdown.querySelector('.dropdown-trigger');
-                const menu = dropdown.querySelector('.dropdown-menu');
-                const hiddenSelect = dropdown.querySelector('select');
-                const options = dropdown.querySelectorAll('.dropdown-option');
-
-                trigger.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const isOpen = trigger.classList.contains('is-open');
-                    
-                    document.querySelectorAll('.custom-dropdown').forEach(d => {
-                        d.querySelector('.dropdown-trigger').classList.remove('is-open');
-                        d.querySelector('.dropdown-menu').classList.remove('is-visible');
-                    });
-
-                    if (!isOpen) {
-                        trigger.classList.add('is-open');
-                        menu.classList.add('is-visible');
-                    }
-                });
-
-                options.forEach(option => {
-                    option.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        const val = option.getAttribute('data-value');
-                        const valueSpan = trigger.querySelector('.dropdown-value');
-                        
-                        valueSpan.textContent = option.textContent;
-                        if (val === '') valueSpan.classList.add('placeholder');
-                        else valueSpan.classList.remove('placeholder');
-
-                        options.forEach(o => o.classList.remove('is-selected'));
-                        option.classList.add('is-selected');
-
-                        hiddenSelect.value = val;
-                        hiddenSelect.dispatchEvent(new Event('change'));
-
-                        trigger.classList.remove('is-open');
-                        menu.classList.remove('is-visible');
-                    });
-                });
+// Custom dropdown logic - FIXED VERSION
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize all custom dropdowns
+    const dropdowns = document.querySelectorAll('.custom-dropdown');
+    
+    dropdowns.forEach(dropdown => {
+        const trigger = dropdown.querySelector('.dropdown-trigger');
+        const menu = dropdown.querySelector('.dropdown-menu');
+        const hiddenSelect = dropdown.querySelector('select');
+        const options = dropdown.querySelectorAll('.dropdown-option');
+        
+        if (!trigger || !menu || !hiddenSelect) return;
+        
+        // Toggle dropdown
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            
+            const isOpen = trigger.classList.contains('is-open');
+            
+            // Close all other dropdowns
+            dropdowns.forEach(d => {
+                const t = d.querySelector('.dropdown-trigger');
+                const m = d.querySelector('.dropdown-menu');
+                if (t && m) {
+                    t.classList.remove('is-open');
+                    m.classList.remove('is-visible');
+                }
             });
-
-            document.addEventListener('click', () => {
-                document.querySelectorAll('.custom-dropdown').forEach(d => {
-                    d.querySelector('.dropdown-trigger').classList.remove('is-open');
-                    d.querySelector('.dropdown-menu').classList.remove('is-visible');
-                });
+            
+            // Toggle this dropdown
+            if (!isOpen) {
+                trigger.classList.add('is-open');
+                menu.classList.add('is-visible');
+            }
+        });
+        
+        // Handle option selection
+        options.forEach(option => {
+            option.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const val = option.getAttribute('data-value');
+                const valueSpan = trigger.querySelector('.dropdown-value');
+                
+                if (valueSpan) {
+                    valueSpan.textContent = option.textContent;
+                    if (val === '') {
+                        valueSpan.classList.add('placeholder');
+                    } else {
+                        valueSpan.classList.remove('placeholder');
+                    }
+                }
+                
+                // Update selected state
+                options.forEach(o => o.classList.remove('is-selected'));
+                option.classList.add('is-selected');
+                
+                // Update hidden select
+                hiddenSelect.value = val;
+                
+                // Trigger change event for filters
+                const changeEvent = new Event('change', { bubbles: true });
+                hiddenSelect.dispatchEvent(changeEvent);
+                
+                // Close dropdown
+                trigger.classList.remove('is-open');
+                menu.classList.remove('is-visible');
             });
         });
+    });
+    
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', () => {
+        dropdowns.forEach(dropdown => {
+            const trigger = dropdown.querySelector('.dropdown-trigger');
+            const menu = dropdown.querySelector('.dropdown-menu');
+            if (trigger && menu) {
+                trigger.classList.remove('is-open');
+                menu.classList.remove('is-visible');
+            }
+        });
+    });
+    
+    // Prevent clicks inside dropdown from closing it
+    document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
+        dropdown.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    });
+});
 
         loadData();
     </script>
