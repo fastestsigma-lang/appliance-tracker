@@ -106,9 +106,19 @@
                         <option value="">All Types</option>
                     </select>
                 </div>
-                <div class="control-group">
-                    <label class="control-label">Filter by Age</label>
-                    <select id="ageFilter" class="control-select">
+                <div class="custom-dropdown" data-target="ageFilter">
+                    <div class="dropdown-trigger">
+                        <span class="dropdown-value placeholder">All Ages</span>
+                        <div class="dropdown-arrow"></div>
+                    </div>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-option is-selected" data-value="">All Ages</div>
+                        <div class="dropdown-option" data-value="0-2 years">0-2 years</div>
+                        <div class="dropdown-option" data-value="3-5 years">3-5 years</div>
+                        <div class="dropdown-option" data-value="6-10 years">6-10 years</div>
+                        <div class="dropdown-option" data-value="10+ years">10+ years</div>
+                    </div>
+                    <select id="ageFilter" class="control-select" style="display:none;">
                         <option value="">All Ages</option>
                         <option value="0-2 years">0-2 years</option>
                         <option value="3-5 years">3-5 years</option>
