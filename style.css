@@ -100,19 +100,17 @@ body {
     justify-content: center;
     position: relative;
     flex-shrink: 0;
+    color: var(--white);
 }
 
 .rail-mark-glyph::before {
-    content: '';
-    width: 8px;
-    height: 8px;
-    background: var(--white);
-    animation: markPulse 3s var(--ease-soft) infinite;
+    display: none;
 }
 
-@keyframes markPulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.25; transform: scale(0.6); }
+.rail-mark-glyph svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--white);
 }
 
 .rail-name {
@@ -533,9 +531,7 @@ body {
 }
 
 .control-input,
-.control-select,
 .form-input,
-.form-select,
 .form-textarea {
     width: 100%;
     padding: 12px 0;
@@ -552,9 +548,7 @@ body {
 .control-input { font-family: var(--font-mono); font-size: 0.88em; }
 
 .control-input:focus,
-.control-select:focus,
 .form-input:focus,
-.form-select:focus,
 .form-textarea:focus {
     outline: none;
     border-bottom-color: var(--white);
@@ -566,17 +560,107 @@ body {
     color: var(--dimmer);
 }
 
+/* ============ CUSTOM DROPDOWN SYSTEM ============ */
+
 .control-select,
 .form-select {
-    cursor: pointer;
-    appearance: none;
-    background-image: linear-gradient(45deg, transparent 50%, var(--dim) 50%), linear-gradient(135deg, var(--dim) 50%, transparent 50%);
-    background-position: calc(100% - 4px) 55%, calc(100% - 9px) 55%;
-    background-size: 5px 5px, 5px 5px;
-    background-repeat: no-repeat;
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    height: 0;
 }
 
-.form-select option { background: var(--panel-raised); color: var(--white); }
+.custom-dropdown {
+    position: relative;
+    width: 100%;
+    user-select: none;
+}
+
+.dropdown-trigger {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    background: transparent;
+    border-bottom: 1px solid var(--line-bright);
+    color: var(--white);
+    font-family: var(--font-body);
+    font-size: 0.95em;
+    cursor: pointer;
+    transition: border-color 0.3s var(--ease-soft);
+}
+
+.dropdown-trigger:hover,
+.dropdown-trigger.is-open {
+    border-bottom-color: var(--white);
+}
+
+.dropdown-trigger .placeholder {
+    color: var(--dimmer);
+}
+
+.dropdown-arrow {
+    width: 10px;
+    height: 10px;
+    border-right: 1px solid var(--dim);
+    border-bottom: 1px solid var(--dim);
+    transform: rotate(45deg);
+    margin-top: -4px;
+    transition: transform 0.3s var(--ease-soft), border-color 0.3s;
+}
+
+.dropdown-trigger.is-open .dropdown-arrow {
+    transform: rotate(-135deg);
+    border-color: var(--white);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: var(--panel-raised);
+    border: 1px solid var(--line-bright);
+    z-index: 1000;
+    max-height: 250px;
+    overflow-y: auto;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.25s var(--ease-soft);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+}
+
+.dropdown-menu.is-visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-option {
+    padding: 14px 20px;
+    color: var(--dim);
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 1px solid transparent;
+}
+
+.dropdown-option:hover {
+    background: var(--line);
+    color: var(--white);
+}
+
+.dropdown-option.is-selected {
+    color: var(--white);
+    background: rgba(255,255,255,0.05);
+    border-bottom: 1px solid var(--line-bright);
+}
+
+.dropdown-menu::-webkit-scrollbar { width: 6px; }
+.dropdown-menu::-webkit-scrollbar-track { background: var(--panel-raised); }
+.dropdown-menu::-webkit-scrollbar-thumb { background: var(--line-bright); }
 
 /* ============ CHART ============ */
 
@@ -875,21 +959,4 @@ tr:hover td { color: var(--white); }
     .panel-head { flex-direction: column; align-items: flex-start; gap: 14px; }
     .panel-actions { width: 100%; }
     .btn { flex: 1; justify-content: center; }
-}
-
-/* =========================================
-   FIX: Force dropdowns to use light mode colors
-   to prevent OS dark mode from making text invisible
-   ========================================= */
-.control-select,
-.form-select,
-select {
-    color-scheme: light !important;
-}
-
-.control-select option,
-.form-select option,
-select option {
-    background-color: #ffffff !important;
-    color: #000000 !important;
 }
